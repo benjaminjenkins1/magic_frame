@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}{% endblock %}</title>
+  <link rel="shortcut icon" href="/static/favicon.ico" type="image/vnd.microsoft.icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.25/css/uikit.min.css" />
+  <link rel="stylesheet" href="/static/css/custom.css" type="text/css">
+
+  <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+  <META HTTP-EQUIV="Expires" CONTENT="-1">
+
+  </head>
+<body>
+
+  <div id="header">
+      
+  </div>
+
+  <div id="content">
+    {% block content %}{% endblock %}
+  </div>
+
+  {% block footer %}
+  <div id="footer">
+    <div class="no-margin-left uk-child-width-expand footer-grid" uk-grid>
+      <a class="text-center {% if active_tab == "photos" %}active-tab{% endif %}" href="/photos"><span uk-icon="icon: image; ratio: 1.5"></span></a>
+      <a class="text-center {% if active_tab == "people" %}active-tab{% endif %}" href="/people"><span uk-icon="icon: users; ratio: 1.5"></span></a>
+      <a class="text-center {% if active_tab == "settings" %}active-tab{% endif %}" href="/settings"><span uk-icon="icon: cog; ratio: 1.5"></span></a>
+    </div>
+  </div>
+  {% endblock %}
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.25/js/uikit.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/uikit/3.0.0-rc.25/js/uikit-icons.min.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

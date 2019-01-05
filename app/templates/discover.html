@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Find Frame{% endblock %}
+{% block content %}
+<div class="text-center">
+  <p id="discovery-progress-label" class="uk-margin-medium-bottom">Searching...</p>
+  <div id="frames-list"></div>
+  <div id="discovery-spinner" uk-spinner="ratio: 2"></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/deviceDiscovery.js"></script>
+{% endblock %}

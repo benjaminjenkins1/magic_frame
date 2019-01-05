@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}
+  Pick a Name
+{% endblock %}
+{% block content %}
+  <h1 class="uk-heading-line uk-text-center uk-padding"><span>New here?</span></h1>
+  <div class="text-center">
+    <p>All you have to do is pick a name.</p>
+    <form action="/username" method="POST">
+      <div class="uk-inline">
+        <input type="text" name="username" id="username-input" class="uk-input uk-form-width-medium" placeholder="Your name">
+      </div>
+      <div>
+        {% if error %}
+          <p class="signin-error"><span uk-icon="icon: warning"></span> Please choose a different name.</p>
+        {% endif %}
+      </div>
+      <input class="uk-margin-top uk-button uk-button-primary" type="submit">
+    </form>
+  </div>
+{% endblock %}
+{% block footer %}{% endblock %}

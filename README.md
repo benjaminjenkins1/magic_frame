@@ -1,1 +1,1 @@
-# jmphoto
+# Magic Frame

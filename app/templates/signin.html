@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}
+  Sign In
+{% endblock %}
+{% block content %}
+  <h1 class="uk-heading-line uk-text-center uk-padding"><span>Sign In</span></h1>
+  {% if page == "phone" %}
+    <div class="text-center">
+      <form action="/signin" method="POST">
+        <div class="uk-inline">
+          <a class="uk-form-icon uk-form-icon" href="" uk-icon="icon: receiver"></a>
+          <input type="tel" name="phone-number" id="phone-input" class="uk-form-width-medium uk-input" placeholder="Phone number">
+        </div>
+        <div>
+          {% if error %}
+            <p class="signin-error">Oops, that didn't look like a phone number.<br>Please try again.</p>
+          {% endif %}
+        </div>
+        <input class="uk-margin-large-top uk-button uk-button-primary" type="submit">
+      </form>
+    </div>
+  {% endif %}
+  {% if page == "code" %}
+    <div class="text-center">
+      <div class="code-sent-message uk-card uk-card-primary uk-card-body uk-margin-bottom">
+        <p>A sign-in code has been sent to<br>{{ phone_number }}<br></p>
+      </div>
+      <form action="/otp" method="POST">
+        <div class="uk-inline">
+          <input type="text" pattern="\d*" name="otp" id="otp-input" class="uk-form-width-medium uk-input" placeholder="Type your code here">
+        </div>
+        <div>
+          {% if error %}
+            <p class="signin-error">
+              Invalid code.
+            </p>
+          {% endif %}
+        </div>
+        <input class="uk-margin-large-top uk-margin-medium-bottom uk-button uk-button-primary" type="submit">
+        <p>
+          Didn't get a code?
+          <br>
+          <a href="/resend">You can try resending it.</a>
+        </p>
+      </form>
+    </div>
+  {% endif %}
+{% endblock %}
+{% block footer %}{% endblock %}
+{% block scripts %} 
+  <script src="/static/js/phoneFormat.js"></script>
+{% endblock %}
