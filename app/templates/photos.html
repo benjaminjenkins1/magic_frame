@@ -1,5 +1,40 @@
 {% extends "base.html" %}
 {% block title %}Photos{% endblock %}
 {% block content %}
-Photos
+<div class="uk-align-left">
+  <form id="upload-form" action="/addphotos" method="post" enctype="multipart/form-data">
+    <input id="file-input" type="file" name="files" multiple hidden>
+    <button class="uk-button uk-button-primary" id="upload-button">Upload</button>
+  </form>
+</div>
+<div class="uk-align-right">
+    <button id="select-photos" class="uk-button uk-button-primary">Select</button>
+</div>
+<div class="uk-clearfix"></div>
+<div class="uk-align-right">
+    <button id="delete-photos" class="uk-hidden uk-button uk-button-danger">Delete</button>
+</div>
+<form id="delete-form" method="post" action="" hidden></form>
+<div class="uk-clearfix"></div>
+{% with messages = get_flashed_messages() %}
+  {% for message in messages %}
+    <div class="uk-card uk-card-default uk-card-body">
+      <p class="error-text">{{ message }}</p>
+    </div>
+  {% endfor %}
+{% endwith %}
+<div class="photo-container uk-flex uk-flex-wrap uk-flex-around">
+  {% for photo in photos %}
+    <div class="photo-tile uk-flex-none uk-position-small">
+      <img class="noselect uk-position-center" src="/getimg?name={{ photo[1] }}">
+      <div class="photo-lightbox" uk-lightbox>
+          <a href="/getimg?name={{ photo[0] }}"></a>
+      </div>
+      <div class="uk-position-cover select-overlay uk-hidden" data-filename="{{ photo[0] }}"></div>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/photos.js"></script>
 {% endblock %}

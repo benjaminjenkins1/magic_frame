@@ -1,5 +1,5 @@
 CREATE TABLE users (
-  phone INTEGER,
+  phone INTEGER NOT NULL,
   username TEXT,
   otp_hash TEXT,
   otp_created DATETIME,
@@ -7,11 +7,12 @@ CREATE TABLE users (
 );
 
 CREATE TABLE photos (
-  photo BLOB NOT NULL,
-  thumbnail BLOB NOT NULL,
-  owner_phone INTEGER NOT NULL,
+  filename TEXT NOT NULL,
+  thumb_filename TEXT NOT NULL,
+  owner INTEGER NOT NULL,
   date_added DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (owner_phone) REFERENCES users(phone)
+  PRIMARY KEY (filename)
+  FOREIGN KEY (owner) REFERENCES users(phone)
 );
 
 CREATE TABLE friends (
@@ -23,9 +24,9 @@ CREATE TABLE friends (
 );
 
 CREATE TABLE frames (
-  uuid TEXT,
+  uuid TEXT NOT NULL,
   owner INTEGER NOT NULL,
-  PRIMARY KEY (uuid),
+  PRIMARY KEY (uuid, owner),
   FOREIGN KEY (owner) REFERENCES users(phone)
 );
 

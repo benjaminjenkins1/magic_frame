@@ -1,5 +1,72 @@
 {% extends "base.html" %}
 {% block title %}People{% endblock %}
 {% block content %}
-People
+<div class="text-center">
+  <h2 class="uk-heading-line uk-text-center uk-padding"><span>Add a Friend</span></h2>
+  <form action="/addfriend" method="POST">
+    <div class="uk-inline">
+      <span class="uk-form-icon uk-form-icon" href="" uk-icon="icon: receiver"></span>
+      <input type="tel" name="phone-number" id="phone-input" class="uk-form-width-medium uk-input" placeholder="Phone number">
+    </div>
+    <div>
+      {% if error %}
+        <p class="signin-error">Oops, that didn't look like a phone number.<br>Please try again.</p>
+      {% endif %}
+    </div>
+    <button id="phone-submit" class="uk-margin-top uk-button uk-button-primary" type="submit" disabled>Add</button>
+  </form>
+  {% if friend_requests|length > 0 %}
+    <h2 class="uk-heading-line uk-text-center uk-padding"><span>Friend Requests</span></h2>
+    {% for user in friend_requests %}
+      <div class="uk-card uk-card-default uk-card-body uk-margin-small-bottom">
+          <span>{{ user[0]|e }}</span>
+          <div class="uk-align-right">
+            <form class="uk-inline" action="/addfriend" method="POST">
+              <input name="phone-number" type="tel" value="{{ user[1] }}" hidden>
+              <button type="submit" class="uk-button uk-button-primary uk-button-small">Accept</button>
+            </form>
+            <form class="uk-inline" action="/declinefriend" method="POST">
+              <input name="phone-number" type="tel" value="{{ user[1] }}" hidden>
+              <button type="submit" class="uk-button uk-button-danger uk-button-small">Decline</button>
+            </form>
+          </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+  {% if pending_requests|length > 0 %}
+    <h2 class="uk-heading-line uk-text-center uk-padding"><span>Pending Requests</span></h2>
+    {% for user in pending_requests %}
+      <div class="uk-card uk-card-default uk-card-body uk-margin-small-bottom">
+          <span>{{ user }}</span>
+          <div class="uk-align-right">
+            <form action="/removefriend" method="POST">
+              <input name="phone-number" type="tel" value="{{ user }}" hidden>
+              <button type="submit" class="uk-button uk-button-danger uk-button-small">Cancel</button>
+            </form>
+          </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+  <h2 class="uk-heading-line uk-text-center uk-padding"><span>Friends</span></h2>
+  {% if friends|length > 0 %}
+    {% for user in friends %}
+      <div class="uk-card uk-card-default uk-card-body uk-margin-small-bottom">
+          <span>{{ user[0]|e }}</span>
+          <div class="uk-align-right">
+            <form action="/removefriend" method="POST">
+              <input name="phone-number" type="tel" value="{{ user[1] }}" hidden>
+              <button type="submit" class="uk-button uk-button-danger uk-button-small">Remove</button>
+            </form>
+          </div>
+      </div>
+    {% endfor %}
+  {% else %}
+    <div class="uk-card uk-card-default uk-card-body">
+      <p>You don't have any friends yet.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+{% block scripts %}
+  <script src="/static/js/phoneFormat.js"></script>
 {% endblock %}

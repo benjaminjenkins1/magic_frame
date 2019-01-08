@@ -46,10 +46,22 @@
     if(input.length > 6){target.value = `(${zip}) ${middle} - ${last}`;}
     else if(input.length > 3){target.value = `(${zip}) ${middle}`;}
     else if(input.length > 0){target.value = `(${zip}`;}
+
   };
 
   const inputElement = document.getElementById('phone-input');
   inputElement.addEventListener('keydown',enforceFormat);
   inputElement.addEventListener('keyup',formatToPhone);
+  inputElement.addEventListener('keyup', (event) => {
+    value = event.target.value;
+    if(value.length === 16) {
+      let submit = document.getElementById('phone-submit');
+      submit.removeAttribute("disabled");
+    }
+    else {
+      let submit = document.getElementById('phone-submit');
+      submit.setAttribute("disabled", true);
+    }
+  });
 
 })();

@@ -8,7 +8,7 @@
     <div class="text-center">
       <form action="/signin" method="POST">
         <div class="uk-inline">
-          <a class="uk-form-icon uk-form-icon" href="" uk-icon="icon: receiver"></a>
+          <span class="uk-form-icon uk-form-icon" href="" uk-icon="icon: receiver"></span>
           <input type="tel" name="phone-number" id="phone-input" class="uk-form-width-medium uk-input" placeholder="Phone number">
         </div>
         <div>
@@ -16,7 +16,7 @@
             <p class="signin-error">Oops, that didn't look like a phone number.<br>Please try again.</p>
           {% endif %}
         </div>
-        <input class="uk-margin-large-top uk-button uk-button-primary" type="submit">
+        <input id="phone-submit" class="uk-margin-large-top uk-button uk-button-primary" type="submit" disabled>
       </form>
     </div>
   {% endif %}

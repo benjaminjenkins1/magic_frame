@@ -2,7 +2,7 @@
 
   let range = [];
 
-  const subnets = ["196.168.1.", "10.0.0."];
+  const subnets = ["192.168.1.", "10.0.0."];
 
   subnets.forEach(subnet => {
     for (let i = 0; i < 256; i++) {
@@ -11,8 +11,8 @@
   });
   
   range.push('benjen.me'); // remove in prod
-
-  //console.log(range);
+  
+  remaining_addresses = range.slice();
 
   range.forEach(function(address) {
     probeDevice(address);
@@ -23,13 +23,13 @@
     let xhr = new XMLHttpRequest();
   
     let url = 'http://' + address.toString() + ':8050/hello'; 
-    //console.log('probing ' + url);
+    console.log('probing ' + url);
   
     xhr.onload = function() {
   
       if (xhr.status >= 200 && xhr.status < 300) {
         console.log(xhr.response);
-        if(xhr.response.split('@')[0] === 'jmphoto') {
+        if(xhr.response.split('@')[0] === 'magicframe') {
           let frameID = xhr.response.split('@')[1];
           console.log('Found frame with id ' + frameID + ' at ' + address);
           addFrameToList(address, frameID);
@@ -42,8 +42,8 @@
     };
 
     xhr.addEventListener('loadend', function() {
-      range = range.filter(elem => elem != address);
-      if(range.length === 0) {
+      remaining_addresses = remaining_addresses.filter(elem => elem != address);
+      if(remaining_addresses.length === 0) {
         replaceSpinner();
       }
     });
@@ -56,13 +56,13 @@
   
   function addFrameToList(address, frameID) {
   
-    let button = document.createElement('button');
-    button.className = 'uk-margin-medium-bottom uk-button uk-button-primary';
-    button.innerHTML = 'Frame at ' + address;
-    button.onclick = function() { window.location.href = '/addframe?id=' + frameID; }
+    let a = document.createElement('a');
+    a.className = 'uk-margin-bottom uk-button uk-button-primary';
+    a.innerHTML = 'Frame at ' + address;
+    a.href = '/addframe?id=' + frameID;
   
     let framesList = document.getElementById('frames-list');
-    framesList.appendChild(button);
+    framesList.appendChild(a);
   
   }
 
