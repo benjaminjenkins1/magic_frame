@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Resend Code{% endblock %}
+{% block content %}
+  <h1 class="uk-heading-line uk-text-center uk-padding"><span>Resend Code</span></h1>
+  <div class="text-center">
+    <form action="/resend_otp" method="POST">
+      <div class="uk-inline">
+        <span class="uk-form-icon uk-form-icon" href="" uk-icon="icon: receiver"></span>
+        <input value="{{ phone }}" type="tel" name="phone-number" id="phone-input" class="uk-form-width-medium uk-input" placeholder="Phone number">
+      </div>
+      <div>
+        {% with messages = get_flashed_messages() %}
+          {% for message in messages %}
+            <p class="uk-margin-top error-text">{{ message }}</p>
+          {% endfor %}
+        {% endwith %}
+      </div>
+      <div class="text-center uk-margin-top""><div class="uk-display-inline-block uk-align-center g-recaptcha" data-sitekey="6LdTRogUAAAAAJwx8IXvnmH-RkqEkvfLdkJ8miEw"></div></div>
+      <input id="phone-submit" class="uk-margin-large-top uk-button uk-button-primary" type="submit">
+    </form>
+  </div>
+{% endblock %}
+{% block footer %}{% endblock %}
+{% block scripts %} 
+  <script src='https://www.google.com/recaptcha/api.js'></script>
+  <script src="/static/js/phoneFormat.js"></script>
+{% endblock %}

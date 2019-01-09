@@ -14,6 +14,10 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 IMAGE_SIZE = 1920, 1920
 THUMBNAIL_SIZE = 120, 120
+# pixels
+
+OTP_LIFETIME = 1800
+# seconds
 
 class User:
 
@@ -34,7 +38,8 @@ class User:
     return self.c.fetchone()[0]
 
   def authenticate(self, otp):
-    #TODO: code age check (30 minutes)
+    if self.otp_age() > OTP_LIFETIME:
+      return False
     self.c.execute('SELECT otp_hash FROM users WHERE phone=?', (self.phone,))
     otp_hash = self.c.fetchone()[0]
     return pbkdf2_sha256.verify(otp, otp_hash)
@@ -44,19 +49,30 @@ class User:
     self.conn.commit()
 
   def add_otp(self):
-    #TODO: Code send cooldown (1 minute)
     otp = ''.join(secrets.choice(string.digits) for i in range(7))
-    print(otp)
+    print('OTP for ' + self.phone + ': ' + otp)
     client = Client(twilio_id, twilio_key)
     message_body = "Your Magic Frame sign-in code is " + otp
-    #message = client.messages.create(
-    #    to=self.phone, 
-    #    from_="+19142299502",
-    #    body=message_body)
+    message = client.messages.create(
+        to=self.phone, 
+        from_="+19142299502",
+        body=message_body)
     #print(message.sid)
     otp_hash = pbkdf2_sha256.hash(otp)
     self.c.execute('UPDATE users SET otp_hash=? WHERE phone=?', (otp_hash, self.phone))
     self.conn.commit()
+
+  # Get otp age in seconds
+  def otp_age(self):
+    query = ("SELECT (julianday(CURRENT_TIMESTAMP)-julianday(otp_created))*(86400)"
+             "FROM users "
+             "WHERE phone=?"
+    )
+    self.c.execute(query, (self.phone,))
+    result = self.c.fetchone()
+    if result is None:
+      return None
+    return result[0]
 
   def add_friend(self, friend_phone):
     self.c.execute('INSERT OR IGNORE INTO friends VALUES (?, ?)', (self.phone, friend_phone))
@@ -113,6 +129,11 @@ class User:
 
   def add_frame(self, frameID):
     query = "INSERT OR IGNORE INTO frames (uuid, owner) VALUES (?, ?)"
+    self.c.execute(query, (frameID, self.phone))
+    self.conn.commit()
+
+  def remove_frame(self, frameID):
+    query = "DELETE FROM frames WHERE uuid=? AND owner=?"
     self.c.execute(query, (frameID, self.phone))
     self.conn.commit()
 

@@ -12,9 +12,11 @@
           <input type="tel" name="phone-number" id="phone-input" class="uk-form-width-medium uk-input" placeholder="Phone number">
         </div>
         <div>
-          {% if error %}
-            <p class="signin-error">Oops, that didn't look like a phone number.<br>Please try again.</p>
-          {% endif %}
+          {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+              <p class="uk-margin-top error-text">{{ message }}.</p>
+            {% endfor %}
+          {% endwith %}
         </div>
         <input id="phone-submit" class="uk-margin-large-top uk-button uk-button-primary" type="submit" disabled>
       </form>
@@ -25,22 +27,22 @@
       <div class="code-sent-message uk-card uk-card-primary uk-card-body uk-margin-bottom">
         <p>A sign-in code has been sent to<br>{{ phone_number }}<br></p>
       </div>
-      <form action="/otp" method="POST">
+      <form action="/auth" method="POST">
         <div class="uk-inline">
           <input type="text" pattern="\d*" name="otp" id="otp-input" class="uk-form-width-medium uk-input" placeholder="Type your code here">
         </div>
         <div>
-          {% if error %}
-            <p class="signin-error">
-              Invalid code.
-            </p>
-          {% endif %}
+          {% with messages = get_flashed_messages() %}
+            {% for message in messages %}
+              <p class="uk-margin-top error-text">{{ message }}</p>
+            {% endfor %}
+          {% endwith %}
         </div>
         <input class="uk-margin-large-top uk-margin-medium-bottom uk-button uk-button-primary" type="submit">
         <p>
           Didn't get a code?
           <br>
-          <a href="/resend">You can try resending it.</a>
+          <a href="/resend_otp">You can try resending it.</a>
         </p>
       </form>
     </div>

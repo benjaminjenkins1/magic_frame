@@ -31,7 +31,7 @@ CREATE TABLE frames (
 );
 
 CREATE TRIGGER new_otp
-AFTER UPDATE OF otp ON users
+AFTER UPDATE OF otp_hash ON users
 FOR EACH ROW
 BEGIN
   UPDATE users SET otp_created=CURRENT_TIMESTAMP WHERE phone=old.phone;

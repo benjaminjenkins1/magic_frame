@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, session, redirect, flash, send_from_directory, jsonify
-import re
+import re, requests
 from user import User
 from frame import Frame
 
@@ -7,6 +7,11 @@ app = Flask(__name__)
 
 with open('secret.txt', 'r') as secret_file:
     app.secret_key = secret_file.read().replace('\n', '')
+with open('recaptcha_key.txt', 'r') as recaptcha_key_file:
+    RECAPTCHA_KEY = recaptcha_key_file.read().replace('\n', '')
+
+OTP_COOLDOWN = 120
+# seconds
 
 @app.route('/', methods=['GET'])
 def home():
@@ -75,19 +80,48 @@ def sign_in():
   elif request.method == 'POST':
     phone_number = re.sub('[^0-9]', '', request.form['phone-number'])
     if len(phone_number) != 10:
-      return render_template('signin.html', page='phone', error=True)
+      flash('Oops, that didn\'t look like a phone number.<br>Please try again.')
+      return render_template('signin.html', page='phone')
     session['phone'] = request.form['phone-number']
     # make a new otp for the phone number and send to code input
     user = User(phone_number)
-    user.add_otp()
+    otp_age = user.otp_age()
+    #print(otp_age)
+    if otp_age is None or otp_age > OTP_COOLDOWN:
+      user.add_otp()
     return render_template('signin.html', page='code', phone_number=session['phone'])
 
-@app.route('/otp', methods=['POST'])
+@app.route('/resend_otp', methods=['GET', 'POST'])
+def resend_otp():
+  if request.method == 'GET':
+    return render_template('resend.html', phone=session['phone'])
+  if request.method == 'POST':
+    phone_number = re.sub('[^0-9]', '', request.form['phone-number'])
+    if len(phone_number) != 10:
+      flash('Oops, that didn\'t look like a phone number.<br>Please try again.')
+      return render_template('resend.html', phone=request.form['phone-number'])
+    captcha_data = {
+      'secret': RECAPTCHA_KEY,
+      'response': request.form['g-recaptcha-response']
+    }
+    r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=captcha_data)
+    if r.json()['success']:
+      session['phone'] = request.form['phone-number']
+      user = User(phone_number)
+      user.add_otp()
+      flash('Another code has been sent to ' + request.form['phone-number'] + '.')
+      return render_template('signin.html', page='code', phone_number=session['phone'])
+    else:
+      flash('Please complete the captcha.')
+      return render_template('resend.html', phone=request.form['phone-number'])
+
+@app.route('/auth', methods=['POST'])
 def one_time_password():
   # validate before making user/querying
   otp = re.sub('[^0-9]', '', request.form['otp'])
   if len(otp) != 7:
-    return render_template('signin.html', page='code', error=True, phone_number=session['phone'])
+    flash('Invalid or expired code.')
+    return render_template('signin.html', page='code', phone_number=session['phone'])
   # make a User with the phone number and otp
   phone_number = re.sub('[^0-9]', '', session['phone'])
   user = User(phone_number)
@@ -101,6 +135,7 @@ def one_time_password():
       session['name'] = user.name
       return redirect('/photos')
   # all else failed, send the error message
+  flash('Invalid or expired code.')
   return render_template('signin.html', page='code', error=True, phone_number=session['phone'])
 
 @app.route('/username', methods=['POST'])
@@ -171,11 +206,11 @@ def add_photos():
 def delete_photos():
   if session.get('logged_in') is None:
     return redirect('/signin')
-  filenames = request.args.getlist('name')
+  filenames = request.form.getlist('name[]')
   phone_number = re.sub('[^0-9]', '', session['phone'])
   user = User(phone_number)
   for filename in filenames:
-    print(filename)
+    #print(filename)
     if user.owns_image(filename):
       user.delete_photo(filename)
   return redirect('/photos')
@@ -214,3 +249,12 @@ def frame_get_photo():
     return send_from_directory('uploads', filename)
   else:
     return ''
+
+@app.route('/removeframe', methods=['POST'])
+def remove_frame():
+  if session.get('logged_in') is None:
+    return redirect('/signin')
+  phone_number = re.sub('[^0-9]', '', session['phone'])
+  user = User(phone_number)
+  user.remove_frame(request.form['frameID'])
+  return redirect('/settings')

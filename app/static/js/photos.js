@@ -15,7 +15,7 @@
   
   fileInput.addEventListener('change', (event) => {
     const form = document.getElementById('upload-form');
-    form.submit();
+    postForm(form);
   });
 
   selectButton.addEventListener('click', (event) => {
@@ -49,14 +49,34 @@
       filename = elem.getAttribute('data-filename');
       files.push(filename);
     }
-    query = '/deletephotos?';
+    let formData = new FormData();
     for(let filename of files) {
-      query += 'name=' + filename + '&';
+      formData.append('name[]', filename);
     }
-    console.log(query);
-    let deleteForm = document.getElementById('delete-form');
-    deleteForm.setAttribute('action', query);
-    deleteForm.submit();
+    let xhr = new XMLHttpRequest();
+    xhr.addEventListener('loadend', () => {
+      if(xhr.status === 200) {
+        window.location.replace("/photos");
+      }
+    });
+    xhr.open("POST", '/deletephotos');
+    xhr.send(formData);
   });
+
+  function postForm(form){
+    const action = form.getAttribute('action');
+    let formData = new FormData(form);
+    let xhr = new XMLHttpRequest();
+    xhr.open("POST", action);
+    xhr.addEventListener('loadstart', () => {
+      UIkit.notification('Uploading <div class="uk-align-right" uk-spinner></div>', {pos: 'top-center', status: 'primary'})
+    });
+    xhr.addEventListener('loadend', () => {
+      if(xhr.status === 200) {
+        window.location.replace("/photos");
+      }
+    });
+    xhr.send(formData);
+  }
 
 })();

@@ -1,7 +1,7 @@
 (function() {
 
-  const POLLING_INTERVAL   = 20000;
-  const SLIDESHOW_INTERVAL = 5000;
+  const POLLING_INTERVAL   = 120000;
+  const SLIDESHOW_INTERVAL = 15000;
   const XHR_TIMEOUT        = 10000; 
   const ANIMATION_DURATION = 1000;
   
