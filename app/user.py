@@ -3,6 +3,7 @@ from passlib.hash import pbkdf2_sha256
 from PIL import Image
 from twilio.rest import Client
 import os
+import piexif
 
 with open('twilio_key.txt', 'r') as keyfile:
   twilio_key = keyfile.read().replace('\n', '')
@@ -144,16 +145,26 @@ class User:
 
   def add_photo(self, file):
     if allowed_file(file.filename):
-      image_filename = ''.join(secrets.choice(string.digits + string.ascii_letters) for i in range(20)) + '.png'
-      thumb_filename = ''.join(secrets.choice(string.digits + string.ascii_letters) for i in range(20)) + '.png'
+      image_filename = ''.join(secrets.choice(string.digits + string.ascii_letters) for i in range(20)) + '.jpg'
+      thumb_filename = ''.join(secrets.choice(string.digits + string.ascii_letters) for i in range(20)) + '.jpg'
       # resize and save 1920px image
       image = Image.open(file)
+      if 'exif' in image.info:
+        image_exif_dict = piexif.load(image.info['exif'])
+        image_exif_bytes = piexif.dump(image_exif_dict)
+      else:
+        image_exif_bytes = b''
       image.thumbnail(IMAGE_SIZE, Image.ANTIALIAS)
-      image.convert('RGB').save(os.path.join(UPLOAD_FOLDER, image_filename), "PNG", optimize=True)
+      image.convert('RGB').save(os.path.join(UPLOAD_FOLDER, image_filename), "JPEG", optimize=True, exif=image_exif_bytes)
       # resize and save 120px image
       thumb = Image.open(file)
+      if 'exif' in image.info:
+        thumb_exif_dict = piexif.load(thumb.info['exif'])
+        thumb_exif_bytes = piexif.dump(thumb_exif_dict)
+      else:
+        thumb_exif_bytes = b''
       thumb.thumbnail(THUMBNAIL_SIZE, Image.ANTIALIAS)
-      thumb.convert('RGB').save(os.path.join(UPLOAD_FOLDER, thumb_filename), "PNG", optimize=True)
+      thumb.convert('RGB').save(os.path.join(UPLOAD_FOLDER, thumb_filename), "JPEG", optimize=True, exif=thumb_exif_bytes)
       # insert db record
       query = "INSERT INTO photos (filename, thumb_filename, owner) VALUES (?, ?,?)"
       self.c.execute(query, (image_filename, thumb_filename, self.phone))

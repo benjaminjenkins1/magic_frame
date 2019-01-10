@@ -164,6 +164,10 @@ def add_friend():
   phone_number = re.sub('[^0-9]', '', session['phone'])
   friend_phone = re.sub('[^0-9]', '', request.form['phone-number'])
   if len(friend_phone) != 10:
+    flash('Oops, that didn\'t look like a phone number.<br>Please try again')
+    return redirect('/people')
+  if phone_number == friend_phone:
+    flash('That\'s you!')
     return redirect('/people')
   user = User(phone_number)
   user.add_friend(friend_phone)

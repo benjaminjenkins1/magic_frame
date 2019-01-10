@@ -11,7 +11,7 @@ body {
 }
 
 #content {
-  padding: 3rem 1rem 10rem 1rem;
+  padding: 1rem 1rem 10rem 1rem;
   margin: auto;
   max-width: 36rem;
 }
@@ -32,6 +32,7 @@ h1, h2 {
   bottom:0;
   width: 100%;
   background-color: white;
+  z-index: 99;
 }
 
 #alternate-footer {

@@ -69,7 +69,8 @@
     let xhr = new XMLHttpRequest();
     xhr.open("POST", action);
     xhr.addEventListener('loadstart', () => {
-      UIkit.notification('Uploading <div class="uk-align-right" uk-spinner></div>', {pos: 'top-center', status: 'primary'})
+      const options = {pos: 'top-center', status: 'primary', timeout: 100000};
+      UIkit.notification('Uploading <div class="uk-align-right" uk-spinner></div>', options)
     });
     xhr.addEventListener('loadend', () => {
       if(xhr.status === 200) {
